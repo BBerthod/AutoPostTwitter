@@ -1,3 +1,13 @@
+Functionality:
+	- Status (URL et nom de l'article)
+	- Image (Image de l'article)
+	- Envoi grâce à une tache cron
+
+Installation:
+Tmp dans /admin***/tmp
+tmp/ 0777
+A placer dans modules
+
 twitter-api-php
 ===============
 
@@ -103,3 +113,4 @@ echo $twitter->setGetfield($getfield)
 ```
 
 That is it! Really simple, works great with the 1.1 API. Thanks to @lackovic10 and @rivers on SO!
+
