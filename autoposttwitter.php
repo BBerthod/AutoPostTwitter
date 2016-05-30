@@ -125,22 +125,93 @@ class AutoPostTwitter extends Module
 
 require_once('TwitterAPIExchange.php');
 $settings = array(
-    'oauth_access_token' => "2696463349-meob2jcqrtsoBgWRnGTfaqNs4dzGj4Ri3D6pw2v",
-    'oauth_access_token_secret' => "bY31sBZHkbsUnEDbmkFcnggVGjGsFPl9Su6CeN7oGu6ht",
-    'consumer_key' => "DwaIrBNnUBOvOepa4i27gM7iQ",
-    'consumer_secret' => "uUwEnur8B0KMk3llUhKSXdBdKcLWzOxnGpUUJn7mJiGPjjgFfd"
+  'oauth_access_token' => "3437645865-wfxDPSR2tqSGMZP0qfSrV9usC5yfKFscGfhNhLH",
+  'oauth_access_token_secret' => "i3uZ4SmmP5hcnE8wE465JocmrFRhLmt9inCNxwlCJkfiY",
+  'consumer_key' => "FZM90efDxx3MZeOB5tJlwisvF",
+  'consumer_secret' => "HFCdQFIjACVHpiNE4LiI9q1JeJv6JpkCloNDmI0pAc5S7Zk4PK"
+  );
+
+//On génere un id produit et on récupére le nom
+function randomProductId(){
+  $product_id = rand(543, 1055);
+  $product = new Product($product_id);
+  while (Product::getProductName($product_id) == null) {
+   $product_id = rand(543, 1055);
+   $product = new Product($product_id); 
+ }
+ return $product_id;
+}
+
+function testIfProductActive($product_id){
+ $product = new Product($product_id);
+ while($product->active == 0){
+   $product_id = randomProductId();
+   $product = new Product($product_id);
+ }
+ return $product_id;
+}
+
+function getProductInfo($product_id){
+ $product = new Product($product_id);
+ $name = Product::getProductName($product_id);
+ $link = new Link();
+ 
+ foreach ($product as $prod) {
+  $product_link_rewrite = $prod['link_rewrite'];
+  $product_id_product = $prod['id_product'];
+}
+
+$image = Image::getCover($product_id);
+$imagePaths = $link->getImageLink($product->link_rewrite,  $image['id_image'], 'large_default'); 
+$status = "" . $name . " http://vetementsportauto.fr//index.php?controller=product&id_product=".$product_id."";
+
+return array($status, $imagePaths);
+}
+
+//On récupére un produit actif
+$product_id = randomProductId();
+
+$product_id = testIfProductActive($product_id);
+
+//On génére le status twitter
+// $status = getProductInfo($product_id);
+
+list($status,$imagePaths) = getProductInfo($product_id);
+
+//On tweet
+
+require_once('tmhOAuth.php');
+
+$str = substr($image, 23);
+
+// url de l'image et nom de stockage temporaire
+$tmp                 = 'tmp/'.uniqid().'.jpg';
+// téléchargement et stockage de l'image
+$imagePaths = substr_replace($imagePaths, 'http://', 0, 0).'/Array.jpg';
+
+file_put_contents($tmp, file_get_contents($imagePaths));
+// utilisation du "real path" de l'image
+$image               = realpath($tmp);
+
+
+$tmhOAuth = new tmhOAuth(array(
+    'consumer_key'    => 'FZM90efDxx3MZeOB5tJlwisvF',
+    'consumer_secret' => 'HFCdQFIjACVHpiNE4LiI9q1JeJv6JpkCloNDmI0pAc5S7Zk4PK',
+    'user_token'      => '3437645865-wfxDPSR2tqSGMZP0qfSrV9usC5yfKFscGfhNhLH',
+    'user_secret'     => 'i3uZ4SmmP5hcnE8wE465JocmrFRhLmt9inCNxwlCJkfiY'
+));
+
+$code = $tmhOAuth->request(
+    'POST',
+    $tmhOAuth->url('1.1/statuses/update_with_media'),
+    array(
+        'media[]'  => "@{$image}",
+        'status'   => $status 
+        // 'status'   => phpinfo(INFO_CONFIGURATION)
+    ),
+    true, // use auth
+    true  // multipart
 );
 
-$url = 'https://api.twitter.com/1.1/statuses/update.json'; 
-$requestMethod = 'POST';
-$postfields = array(
-    'status' => 'Hello world, bitch' ); 
-$twitter = new TwitterAPIExchange($settings);
 
-echo $twitter->buildOauth($url, $requestMethod)
-             ->setPostfields($postfields)
-             ->performRequest();
-
-             
-
-?>
+unlink($tmp);
