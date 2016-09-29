@@ -125,10 +125,10 @@ class AutoPostTwitter extends Module
 
 require_once('TwitterAPIExchange.php');
 $settings = array(
-  'oauth_access_token' => "3437645865-wfxDPSR2tqSGMZP0qfSrV9usC5yfKFscGfhNhLH",
-  'oauth_access_token_secret' => "i3uZ4SmmP5hcnE8wE465JocmrFRhLmt9inCNxwlCJkfiY",
-  'consumer_key' => "FZM90efDxx3MZeOB5tJlwisvF",
-  'consumer_secret' => "HFCdQFIjACVHpiNE4LiI9q1JeJv6JpkCloNDmI0pAc5S7Zk4PK"
+  'oauth_access_token' => "Your token",
+  'oauth_access_token_secret' => "Your token",
+  'consumer_key' => "Your token",
+  'consumer_secret' => "Your token"
   );
 
 //On génere un id produit et on récupére le nom
